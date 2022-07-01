@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "diorite",
+  "version": "${version}",
+  "name": "Diorite",
+  "description": "Finally, a clientside inventory filter.",
+  "authors": [
+    "Abstrusle"
+  ],
+  "contact": {},
+  "license": "GPL-3.0",
+  "icon": "assets/diorite/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.puradox.diorite.DioriteClient"
+    ],
+    "modmenu": [
+      "com.puradox.diorite.config.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "diorite.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.8",
+    "fabric": "*",
+    "minecraft": "1.18.2"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "category.diorite.keys": "Diorite",
+  "key.diorite.discard": "Dump",
+  "key.diorite.loadout": "Loadouts",
+
+  "error.diorite.no_selected_loadout": "No trash loadout is selected!",
+  "error.diorite.no_filters": "This loadout doesn't contain any filters!",
+  "error.diorite.not_integer": "A string is not an integer! Please review the configuration.",
+  "error.diorite.bad_id": "Loadout id is invalid!",
+
+  "error.diorite.duplicate_filters": "Entry is a duplicate!",
+  "error.diorite.contains_filter": "Entry contains another entry!",
+
+  "warning.diorite.contained_filter": "Entry contained by another entry! The larger entry will be removed.",
+  "warning.diorite.no_namespace": "No namespace specified! Will default to vanilla.",
+  "warning.diorite.item_not_detected": "Item invalid! Cannot be filtered.",
+
+  "screen.diorite.loadout": "Loadouts",
+  "screen.diorite.edit_loadout": "Loadout Configuration",
+  "screen.diorite.edit_loadout_filters": "Filters",
+  "screen.diorite.configuration": "Diorite Configuration",
+
+  "button.diorite.select_loadout": "Select loadout",
+  "button.diorite.new_loadout": "New loadout",
+
+  "widgets.diorite.name": "Loadout name",
+  "widgets.diorite.building_blocks": "Reserved building blocks",
+  "widgets.diorite.id": "Loadout id",
+  "widgets.diorite.add_entry": "Add an entry.",
+
+  "tooltip.diorite.items": "Items",
+  "tooltip.diorite.names": "Names",
+  "tooltip.diorite.nbt_strings": "Nbt strings",
+
+  "tooltip.diorite.delete_example": "Create a new loadout to hide this!",
+  "tooltip.diorite.delete": "Delete loadout",
+  "tooltip.diorite.save": "Save and return",
+
+  "option.diorite.name": "Loadout name:",
+  "option.diorite.building_blocks": "Reserve for building:",
+  "option.diorite.id": "Loadout position:",
+
+  "option.diorite.dump_on_select": "Perform dump immediately on select",
+  "option.diorite.show_loadout_button": "Show loadout button in inventory"
+
+}
