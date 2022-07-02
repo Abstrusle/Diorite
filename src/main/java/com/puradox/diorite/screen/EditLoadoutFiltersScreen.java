@@ -226,6 +226,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                     unrenderAllEntries();
                     this.setToggled(true);
                     showItems=true;
+                    scrollLevel=0;
                 }
             }
 
@@ -278,6 +279,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                     unrenderAllEntries();
                     this.setToggled(true);
                     showNames=true;
+                    scrollLevel=0;
                 }
             }
 
@@ -329,6 +331,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                     unrenderAllEntries();
                     this.setToggled(true);
                     showNbtStrings=true;
+                    scrollLevel=0;
                 }
             }
 
