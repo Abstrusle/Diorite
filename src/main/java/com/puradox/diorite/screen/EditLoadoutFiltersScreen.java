@@ -441,6 +441,14 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             initEntries();
 
             entryTextField.setText(""); //Clear field after submission.
+        } else if(entryTextField.isFocused() && showItems) {
+            var suggestion = new Object() {String value;};
+            Registry.ITEM.stream().takeWhile(n -> suggestion.value==null).forEach(value -> {
+                if(Registry.ITEM.getId(value).toString().contains(entryTextField.getText())) {
+                    suggestion.value = Registry.ITEM.getId(value).toString();
+                }
+            });
+            entryTextField.setSuggestion(suggestion.value);
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
@@ -489,8 +497,12 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         }
 
         //If text field isn't focused, inform the user.
-        if(modifiable && !entryTextField.isFocused() && entryTextField.getText().length()<1) {
-            textRenderer.draw(matrices, new TranslatableText("widgets.diorite.add_entry"), (this.width - backgroundWidth)/(float)2+23, ((this.height - backgroundHeight)/(float)2)+14, 0xFFFFFFFF);
+        if(modifiable && !entryTextField.isFocused()) {
+            entryTextField.setSuggestion("");
+            if(entryTextField.getText().length()<1) {
+                textRenderer.draw(matrices, new TranslatableText("widgets.diorite.add_entry"), (this.width - backgroundWidth)/(float)2+23, ((this.height - backgroundHeight)/(float)2)+14, 0xFFFFFFFF);
+            }
+
         }
 
         //Render the current error, if present.
