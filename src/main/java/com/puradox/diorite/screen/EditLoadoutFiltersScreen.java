@@ -139,7 +139,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             this.remove(namesButton);
             this.remove(nbtStringsButton);
 
-            unrenderAllEntries();
+            initEntries();
         }
 
         saveButton = new TexturedButtonWidget(this.width/2-22, (this.height+this.backgroundHeight)/2-30, 20, 20, 216, 0, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
@@ -188,7 +188,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                     nbtStringFilters.remove(value.getMessage().asString());
                 });
             }
-            unrenderAllEntries();
+            initEntries();
         });
 
         //For ToggleButtonWidgets: Unselect all. Untoggle other tabs. Render will call to render related widgets. Rendering text must be manual.
@@ -211,7 +211,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                     itemsSelected().forEach((value) -> setToggled(false));
                     this.setToggled(false);
                     showItems=false;
-                    unrenderAllEntries();
+                    initEntries();
                 } else{
                     if(namesButton.isToggled()) {
                         namesSelected().forEach((value) -> setToggled(false));
@@ -223,10 +223,10 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                         nbtStringsButton.setToggled(false);
                         showNbtStrings=false;
                     }
-                    unrenderAllEntries();
+                    scrollLevel=0;
+                    initEntries();
                     this.setToggled(true);
                     showItems=true;
-                    scrollLevel=0;
                 }
             }
 
@@ -264,7 +264,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                     namesSelected().forEach((value) -> setToggled(false));
                     this.setToggled(false);
                     showNames=false;
-                    unrenderAllEntries();
+                    initEntries();
                 } else{
                     if(itemsButton.isToggled()) {
                         itemsSelected().forEach((value) -> setToggled(false));
@@ -276,10 +276,10 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                         nbtStringsButton.setToggled(false);
                         showNbtStrings=false;
                     }
-                    unrenderAllEntries();
+                    scrollLevel=0;
+                    initEntries();
                     this.setToggled(true);
                     showNames=true;
-                    scrollLevel=0;
                 }
             }
 
@@ -314,7 +314,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             @Override public void onClick(double mouseX, double mouseY) {
                 if(isToggled()) {
                     nbtStringsSelected().forEach((value) -> setToggled(false));
-                    unrenderAllEntries();
+                    initEntries();
                     this.setToggled(false);
                     showNbtStrings=false;
                 } else{
@@ -328,10 +328,10 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                         namesButton.setToggled(false);
                         showNames=false;
                     }
-                    unrenderAllEntries();
+                    scrollLevel=0;
+                    initEntries();
                     this.setToggled(true);
                     showNbtStrings=true;
-                    scrollLevel=0;
                 }
             }
 
@@ -559,14 +559,6 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             } //The scrollbar effect will automatically place invalid items outside bounds. This can be used to determine if they're displayed or not.
         });
         areEntriesRendered=true;
-    }
-
-    private void unrenderAllEntries() {
-        itemEntries.forEach(this::remove);
-        nameEntries.forEach(this::remove);
-        nbtStringEntries.forEach(this::remove);
-        initEntries();
-        areEntriesRendered=false;
     }
 
     private List<ToggleItemWidget> itemsSelected() {
