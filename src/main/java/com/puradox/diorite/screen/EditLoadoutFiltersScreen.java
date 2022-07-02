@@ -6,6 +6,7 @@ import com.puradox.diorite.screen.element.ToggleItemWidget;
 import com.puradox.diorite.screen.element.ToggleTextWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -27,8 +28,8 @@ import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
 public class EditLoadoutFiltersScreen extends Screen { //I do not recommend acknowleding anything here as 'best practice.' It just works.
-    public final int backgroundWidth = 237;
-    public final int backgroundHeight = 204;
+    public static final int backgroundWidth = 237;
+    public static final int backgroundHeight = 204;
     private int scrollLevel = 0;
     private static int maxScroll = 1;
     private boolean showItems = false;
@@ -48,6 +49,11 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
 
     private static TextFieldWidget entryTextField;
 
+    private static TexturedButtonWidget leftPageButton;
+    private static TexturedButtonWidget rightPageButton;
+    private static TexturedButtonWidget confirmSelectionButton;
+    private int currentPage;
+
     private static List<ToggleTextWidget> nameEntries;
     private static List<ToggleTextWidget> nbtStringEntries;
     private static List<ToggleItemWidget> itemEntries;
@@ -62,6 +68,8 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
 
     private String currentError = "";
     private int ticks = 0;
+
+    List<ToggleItemWidget> currentItemsPreview = new ArrayList<>();
 
     public EditLoadoutFiltersScreen (LoadoutConfiguration loadout) {
         super(new TranslatableText("screen.diorite.edit_loadout_filters"));
@@ -100,6 +108,8 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         this.addDrawableChild(namesButton);
         this.addDrawableChild(nbtStringsButton);
 
+        //The buttons and entries for the item list are registered in render().
+        currentPage=0;
     }
 
     private void initEntries() {
@@ -113,16 +123,16 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         var f = new Object() {double value = -0.01;}; //Used for Y in item list. Scrollbar will impact these positions.
         nameEntries = new ArrayList<>();
         nameFilters.forEach((value) ->
-                nameEntries.add(new ToggleTextWidget(((this.width - this.backgroundWidth)/2)+10, ((this.height - this.backgroundHeight)/2)+44+(i.value++*10)+(scrollLevel*10), false, new LiteralText(value), this.textRenderer, 0)));
+                nameEntries.add(new ToggleTextWidget(((this.width - backgroundWidth)/2)+10, ((this.height - backgroundHeight)/2)+44+(i.value++*10)+(scrollLevel*10), false, new LiteralText(value), this.textRenderer, 0)));
         i.value=0;
         nbtStringEntries = new ArrayList<>();
         nbtStringFilters.forEach((value) ->
-                nbtStringEntries.add(new ToggleTextWidget(((this.width - this.backgroundWidth)/2)+10, ((this.height - this.backgroundHeight)/2)+44+(i.value++*10)+(scrollLevel*10), false, new LiteralText(value), this.textRenderer, 1)));
+                nbtStringEntries.add(new ToggleTextWidget(((this.width - backgroundWidth)/2)+10, ((this.height - backgroundHeight)/2)+44+(i.value++*10)+(scrollLevel*10), false, new LiteralText(value), this.textRenderer, 1)));
         i.value=0;
         itemEntries = new ArrayList<>();
         itemFilters.forEach((value) -> {
             if(i.value>10) {i.value=0;}
-            itemEntries.add(new ToggleItemWidget(((this.width - this.backgroundWidth)/2)+10+(18*(i.value++)), ((this.height - this.backgroundHeight)/2)+44+(((int)(f.value+=(double)1/11))*18)+(scrollLevel*18), false, value));
+            itemEntries.add(new ToggleItemWidget(((this.width - backgroundWidth)/2)+10+(18*(i.value++)), ((this.height - backgroundHeight)/2)+44+(((int)(f.value+=(double)1/11))*18)+(scrollLevel*18), false, value));
         });
         areEntriesRendered=false;
     }
@@ -142,7 +152,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             initEntries();
         }
 
-        saveButton = new TexturedButtonWidget(this.width/2-22, (this.height+this.backgroundHeight)/2-30, 20, 20, 216, 0, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
+        saveButton = new TexturedButtonWidget(this.width/2-22, (this.height+backgroundHeight)/2-30, 20, 20, 216, 0, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
             this.loadout.itemFilters=itemFilters;
             this.loadout.nameFilters=nameFilters;
             this.loadout.nbtStringFilters=nbtStringFilters;
@@ -151,24 +161,22 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             assert client != null;
             client.setScreen(new EditLoadoutScreen(loadout, true));
         }) {
-            @Override
-            public void renderTooltip(MatrixStack matrixStack, int i, int j) {
+            @Override public void renderTooltip(MatrixStack matrixStack, int i, int j) {
                 EditLoadoutFiltersScreen.this.renderTooltip(matrixStack, new TranslatableText("tooltip.diorite.save"), i, j);
             }
         };
 
-        cancelButton = new TexturedButtonWidget(this.width/2+2, (this.height+this.backgroundHeight)/2-30, 20, 20, 236, 0, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
+        cancelButton = new TexturedButtonWidget(this.width/2+2, (this.height+backgroundHeight)/2-30, 20, 20, 236, 0, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
             loadout=originalLoadout;
             assert client != null;
             client.setScreen(new EditLoadoutScreen(loadout, true));
         }) {
-            @Override
-            public void renderTooltip(MatrixStack matrixStack, int i, int j) {
+            @Override public void renderTooltip(MatrixStack matrixStack, int i, int j) {
                 EditLoadoutFiltersScreen.this.renderTooltip(matrixStack, ScreenTexts.CANCEL, i, j);
             }
         };
 
-        deleteEntryButton = new TexturedButtonWidget(((this.width + this.backgroundWidth)/2)-22, ((this.height - this.backgroundHeight)/2)+20, 16, 16, 48, 0, 16, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
+        deleteEntryButton = new TexturedButtonWidget(((this.width + backgroundWidth)/2)-22, ((this.height - backgroundHeight)/2)+20, 16, 16, 48, 0, 16, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
             if(itemsButton.isToggled()) {
                 itemsSelected().forEach((value) -> {
                     value.visible=false;
@@ -192,7 +200,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         });
 
         //For ToggleButtonWidgets: Unselect all. Untoggle other tabs. Render will call to render related widgets. Rendering text must be manual.
-        itemsButton = new ToggleButtonWidget((this.width/2)-110, ((this.height - this.backgroundHeight)/2)+17, 68, 25, showItems) {
+        itemsButton = new ToggleButtonWidget((this.width/2)-110, ((this.height - backgroundHeight)/2)+17, 68, 25, showItems) {
             @Override public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 if (this.visible) {
                     this.hovered = this.active && ((mouseX >= (double)this.x && mouseY >= (double)this.y && mouseX < (double)(this.x + 12) && mouseY < (double)(this.y + this.height))
@@ -212,6 +220,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                     this.setToggled(false);
                     showItems=false;
                     initEntries();
+                    unrenderRegistryItems();
                 } else{
                     if(namesButton.isToggled()) {
                         namesSelected().forEach((value) -> setToggled(false));
@@ -245,7 +254,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
 
 
 
-        namesButton = new ToggleButtonWidget((this.width/2)-42, ((this.height - this.backgroundHeight)/2)+17, 68, 25, showNames) {
+        namesButton = new ToggleButtonWidget((this.width/2)-42, ((this.height - backgroundHeight)/2)+17, 68, 25, showNames) {
 
             @Override public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 if (this.visible) {
@@ -296,7 +305,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
 
 
 
-        nbtStringsButton = new ToggleButtonWidget((this.width/2)+26, ((this.height - this.backgroundHeight)/2)+17, 68, 25, showNbtStrings) {
+        nbtStringsButton = new ToggleButtonWidget((this.width/2)+26, ((this.height - backgroundHeight)/2)+17, 68, 25, showNbtStrings) {
 
             @Override public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 if (this.visible) {
@@ -348,16 +357,12 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         nbtStringsButton.setTextureUV(0, 132, 68, 25, new Identifier("diorite", "gui/icons.png"));
         nbtStringsButton.setMessage(new TranslatableText("tooltip.diorite.nbt_strings"));
 
-        //Save to the filter if not a duplicate or contained by another (inform player).
         //Use suggestions.
-        //For text, Remove all entries which contain this one.
-
-        entryTextField = new TextFieldWidget(textRenderer, (this.width/2)-95, ((this.height - this.backgroundHeight)/2)+14, 175, 14, new TranslatableText("widgets.diorite.add_entry"));
+        entryTextField = new TextFieldWidget(textRenderer, (this.width/2)-95, ((this.height - backgroundHeight)/2)+14, 175, 14, new TranslatableText("widgets.diorite.add_entry"));
         entryTextField.setDrawsBackground(false);
     }
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if(keyCode == GLFW.GLFW_KEY_ENTER && entryTextField.getText().length()>0 && areEntriesRendered) {
             String text = entryTextField.getText().toLowerCase().trim(); //Remove leading and trailing whitespace, and uncap.
             var b = new Object() {boolean value = true;}; //For breaking loops.
@@ -448,12 +453,18 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             if (itemsButton.isToggled()) {
                 maxScroll=(-itemEntries.size()/88)-88;
                 renderItemEntries();
+                if(modifiable) {
+                    listAllRegistryItems();
+                }
+
             } else if (namesButton.isToggled()) {
                 maxScroll=(-nameEntries.size()/15)-15;
                 renderNameEntries();
+                unrenderRegistryItems();
             } else if (nbtStringsButton.isToggled()) {
                 maxScroll=(-nbtStringEntries.size()/15)-15;
                 renderNbtStringEntries();
+                unrenderRegistryItems();
             }
         }
 
@@ -472,14 +483,14 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, new Identifier("diorite","gui/loadout_gui_extra.png"));
         if(isScrollBarHovered(mouseX, mouseY)) {
-            this.drawTexture(matrices, ((this.width + this.backgroundWidth)/2)-20, (int)(((this.height - this.backgroundHeight)/2)+43+((double)scrollLevel/maxScroll*138)), 33, 0, 12, 15);
+            this.drawTexture(matrices, ((this.width + backgroundWidth)/2)-20, (int)(((this.height - backgroundHeight)/2)+43+((double)scrollLevel/maxScroll*138)), 33, 0, 12, 15);
         } else{
-            this.drawTexture(matrices, ((this.width + this.backgroundWidth)/2)-20, (int)(((this.height - this.backgroundHeight)/2)+43+((double)scrollLevel/maxScroll*138)), 21, 0, 12, 15);
+            this.drawTexture(matrices, ((this.width + backgroundWidth)/2)-20, (int)(((this.height - backgroundHeight)/2)+43+((double)scrollLevel/maxScroll*138)), 21, 0, 12, 15);
         }
 
         //If text field isn't focused, inform the user.
         if(modifiable && !entryTextField.isFocused() && entryTextField.getText().length()<1) {
-            textRenderer.draw(matrices, new TranslatableText("widgets.diorite.add_entry"), (this.width - this.backgroundWidth)/(float)2+23, ((this.height - this.backgroundHeight)/(float)2)+14, 0xFFFFFFFF);
+            textRenderer.draw(matrices, new TranslatableText("widgets.diorite.add_entry"), (this.width - backgroundWidth)/(float)2+23, ((this.height - backgroundHeight)/(float)2)+14, 0xFFFFFFFF);
         }
 
         //Render the current error, if present.
@@ -488,7 +499,6 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             currentError="";
             ticks = 0;
         }
-
     }
 
     @Override
@@ -496,7 +506,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         super.renderBackground(matrices);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, new Identifier("diorite","gui/loadout_gui_filters.png"));
-        this.drawTexture(matrices, (this.width - this.backgroundWidth)/2, (this.height - backgroundHeight)/2, 0, 0, 256, 256);
+        this.drawTexture(matrices, (this.width - backgroundWidth)/2, (this.height - backgroundHeight)/2, 0, 0, 256, 256);
     }
 
     @Override
@@ -527,13 +537,118 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
     }
 
     public boolean isScrollBarHovered(int mouseX, int mouseY) {
-        return mouseX >= (this.width + this.backgroundWidth) / 2 - 20 && mouseX <= (this.width + this.backgroundWidth) / 2 - 8
-                && mouseY >= (this.height - this.backgroundHeight) / 2 + 43 && mouseY <= ((this.height - this.backgroundHeight) / 2)+196;
+        return mouseX >= (this.width + backgroundWidth) / 2 - 20 && mouseX <= (this.width + backgroundWidth) / 2 - 8
+                && mouseY >= (this.height - backgroundHeight) / 2 + 43 && mouseY <= ((this.height - backgroundHeight) / 2)+196;
+    }
+
+    private void listAllRegistryItems() { //Create a selectable widget for each registry item.
+
+        unrenderRegistryItems(); //No stacking.
+
+        var xPos = new Object() {int value;
+            {
+                assert MinecraftClient.getInstance().currentScreen != null;
+                value = (MinecraftClient.getInstance().currentScreen.width + EditLoadoutFiltersScreen.backgroundWidth)/2-18;
+            }
+        };
+        var yPos = new Object() {int value = 0;};
+        var idPos = new Object() {int value = 0;};
+
+        Registry.ITEM.stream().takeWhile(n -> yPos.value<height-48).forEach((value) -> {
+                if (xPos.value > width - 35) {
+                    xPos.value = (this.width + backgroundWidth) / 2;
+                    yPos.value += 18;
+                }
+                xPos.value+=18;
+                idPos.value++;
+        }); //Determining how many items fit. Definitely not the efficient means to do this, but for some reason I'm unable to math this.
+        int itemsFit = idPos.value;
+
+        assert MinecraftClient.getInstance().currentScreen != null;
+        xPos.value=(MinecraftClient.getInstance().currentScreen.width + EditLoadoutFiltersScreen.backgroundWidth)/2;
+        yPos.value=0;
+        idPos.value=0;
+
+
+
+        Registry.ITEM.stream().takeWhile(n -> yPos.value<height-48).forEach((value) -> {
+            if(idPos.value >= currentPage*itemsFit-2) {
+                if (xPos.value > width - 35) {
+                    xPos.value = (this.width + backgroundWidth) / 2;
+                    yPos.value += 18;
+                }
+                if (yPos.value < height - 48) {
+                    currentItemsPreview.add(new ToggleItemWidget(xPos.value += 18, yPos.value, false, Registry.ITEM.getId(value).toString()));
+                }
+            }
+            idPos.value++;
+        }); //Adding the toggleable item widgets.
+
+        assert MinecraftClient.getInstance().currentScreen != null;
+        leftPageButton = new TexturedButtonWidget((int)(width*0.8), this.height-25, 20, 20, 216, 40, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
+            if (currentPage == 0) {
+                setCurrentError("error.diorite.first_page");
+            } else {
+                currentPage--;
+                listAllRegistryItems();
+            }
+        });
+        rightPageButton = new TexturedButtonWidget((int)(width*0.9), this.height-25,20, 20, 236, 40, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
+            if (currentPage == (int)((double)Registry.ITEM.size()/itemsFit)) {
+                setCurrentError("error.diorite.last_page");
+            } else {
+                currentPage++;
+                listAllRegistryItems();
+            }
+        });
+        confirmSelectionButton = new TexturedButtonWidget((int)(width*0.85), this.height-25, 20, 20, 216, 0, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
+            var b = new Object() {
+                boolean value = true;
+            }; //For breaking loops.
+
+            newItemsSelected().forEach((value) -> {
+                itemFilters.stream().takeWhile(n -> b.value).forEach(entry -> {
+                    if (value.getItemString().equals(entry)) {
+                        setCurrentError("error.diorite.duplicate_filters");
+                        b.value = false;
+                    }
+                });
+                if (b.value) {
+                    itemFilters.add(0, value.getItemString()); //Add the entry.
+                }
+                value.setToggled(false);
+                b.value=true;
+
+            });
+            initEntries();
+
+        });
+
+
+        currentItemsPreview.forEach(this::addDrawableChild);
+
+        this.addDrawableChild(leftPageButton);
+        this.addDrawableChild(rightPageButton);
+        this.addDrawableChild(confirmSelectionButton);
+    }
+
+    private void unrenderRegistryItems() {
+        if(!itemsButton.isToggled()) {currentPage=0;} //May be prone to errors. Bugtest here.
+        this.currentItemsPreview.forEach(this::remove);
+        this.currentItemsPreview = new ArrayList<>();
+
+        this.remove(leftPageButton);
+        this.remove(rightPageButton);
+        this.remove(confirmSelectionButton);
+
+        leftPageButton = null;
+        rightPageButton = null;
+        confirmSelectionButton = null;
     }
 
     private void renderItemEntries() {
         itemEntries.forEach((value) -> {
-            if(value.y > ((this.height - this.backgroundHeight)/2)+40 && value.y < this.height / (2)+backgroundHeight/2 - 10) {
+            if(value.y > ((this.height - backgroundHeight)/2)+40 && value.y < this.height / (2)+backgroundHeight/2 - 10) {
                 this.addDrawableChild(value);
                 value.visible=true;
             } //The scrollbar effect will automatically place invalid items outside bounds. This can be used to determine if they're displayed or not.
@@ -543,7 +658,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
 
     private void renderNameEntries() {
         nameEntries.forEach((value) -> {
-            if(value.y > ((this.height - this.backgroundHeight)/2)+40 && value.y < this.height / (2)+backgroundHeight/2 - 10) {
+            if(value.y > ((this.height - backgroundHeight)/2)+40 && value.y < this.height / (2)+backgroundHeight/2 - 10) {
                 this.addDrawableChild(value);
                 value.visible=true;
             } //The scrollbar effect will automatically place invalid items outside bounds. This can be used to determine if they're displayed or not.
@@ -553,7 +668,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
 
     private void renderNbtStringEntries() {
         nbtStringEntries.forEach((value) -> {
-            if(value.y > ((this.height - this.backgroundHeight)/2)+40 && value.y < this.height / (2)+backgroundHeight/2 - 10) {
+            if(value.y > ((this.height - backgroundHeight)/2)+40 && value.y < this.height / (2)+backgroundHeight/2 - 10) {
                 this.addDrawableChild(value);
                 value.visible=true;
             } //The scrollbar effect will automatically place invalid items outside bounds. This can be used to determine if they're displayed or not.
@@ -564,6 +679,14 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
     private List<ToggleItemWidget> itemsSelected() {
         List<ToggleItemWidget> widgets = new ArrayList<>();
         itemEntries.forEach((value) -> {
+            if(value.isToggled()) {widgets.add(value);}
+        });
+        return widgets;
+    }
+
+    private List<ToggleItemWidget> newItemsSelected() {
+        List<ToggleItemWidget> widgets = new ArrayList<>();
+        currentItemsPreview.forEach((value) -> {
             if(value.isToggled()) {widgets.add(value);}
         });
         return widgets;
