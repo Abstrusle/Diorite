@@ -358,99 +358,107 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         nbtStringsButton.setMessage(new TranslatableText("tooltip.diorite.nbt_strings"));
 
         //Use suggestions.
-        entryTextField = new TextFieldWidget(textRenderer, (this.width/2)-95, ((this.height - backgroundHeight)/2)+14, 175, 14, new TranslatableText("widgets.diorite.add_entry"));
-        entryTextField.setDrawsBackground(false);
-    }
-
-    @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if(keyCode == GLFW.GLFW_KEY_ENTER && entryTextField.getText().length()>0 && areEntriesRendered) {
-            String text = entryTextField.getText().toLowerCase().trim(); //Remove leading and trailing whitespace, and uncap.
-            var b = new Object() {boolean value = true;}; //For breaking loops.
-
-            if(showItems) {
-                if (!text.contains(":")) {
-                    text = "minecraft:"+text; //Add identifier if lacking.
-                    setCurrentError("warning.diorite.no_namespace");
+        entryTextField = new TextFieldWidget(textRenderer, (this.width/2)-95, ((this.height - backgroundHeight)/2)+14, 175, 14, new TranslatableText("widgets.diorite.add_entry")) {
+            @Override
+            public boolean charTyped(char chr, int modifiers) {
+                boolean superValue = super.charTyped(chr, modifiers);
+                if(entryTextField.isFocused() && showItems) {
+                    var suggestion = new Object() {String value;};
+                    Registry.ITEM.stream().takeWhile(n -> suggestion.value==null).forEach(value -> {
+                        if(Registry.ITEM.getId(value).toString().contains(entryTextField.getText())) {
+                            suggestion.value = Registry.ITEM.getId(value).toString();
+                        }
+                    });
+                    entryTextField.setSuggestion(suggestion.value);
                 }
-                String finalText = text;
-
-                itemFilters.stream().takeWhile(n -> b.value).forEach(entry -> {
-                    if(finalText.equals(entry)) {
-                        setCurrentError("error.diorite.duplicate_filters");
-                        b.value=false;
-                    }
-                });
-                if(!b.value) {
-                    entryTextField.setText("");
-                    return false;
-                } //If a duplicate, no reason to add it.
-
-                if(Registry.ITEM.getDefaultId().equals(new Identifier(text))) {
-                    setCurrentError("warning.diorite.item_not_detected");
-                }
-
-                itemFilters.add(0, text); //Add the entry.
-
-
-            } else if(showNames) {
-                String finalText1 = text;
-                List<String>newNameFilters= new ArrayList<>(nameFilters);
-                nameFilters.stream().takeWhile(n -> b.value).forEach(entry -> {
-                    if(entry.contains(finalText1)) {
-                        setCurrentError("warning.diorite.contained_filter");
-                        newNameFilters.remove(entry);
-                    } else if(finalText1.contains(entry)) {
-                        setCurrentError("error.diorite.contains_filter");
-                        b.value=false;
-                    }
-                });
-                if(!b.value) {
-                    entryTextField.setText("");
-                    return false;
-                } //A contained filter will always be superior, so why add it?
-                nameFilters=newNameFilters;
-
-                nameFilters.add(0, text);
-
-
-            } else if(showNbtStrings) {
-                String finalText1 = text;
-                List<String>newNbtStringFilters= new ArrayList<>(nameFilters);
-                nbtStringFilters.stream().takeWhile(n -> b.value).forEach(entry -> {
-                    if(entry.contains(finalText1)) {
-                        setCurrentError("warning.diorite.contained_filter");
-                        newNbtStringFilters.remove(entry);
-                    } else if(finalText1.contains(entry)) {
-                        setCurrentError("error.diorite.contains_filter");
-                        b.value=false;
-                    }
-                });
-                if(!b.value) {
-                    entryTextField.setText("");
-                    return false;
-                } //A contained filter will always be superior, so why add it?
-                nbtStringFilters=newNbtStringFilters;
-
-                nbtStringFilters.add(0, text);
-
+                return superValue;
             }
 
+            @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+                boolean superValue = super.keyPressed(keyCode, scanCode, modifiers);
+                if(keyCode == GLFW.GLFW_KEY_ENTER && entryTextField.getText().length()>0 && areEntriesRendered) {
+                    String text = entryTextField.getText().toLowerCase().trim(); //Remove leading and trailing whitespace, and uncap.
+                    var b = new Object() {boolean value = true;}; //For breaking loops.
 
-            assert client != null;
-            client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 0.8F));
-            initEntries();
+                    if(showItems) {
+                        if (!text.contains(":")) {
+                            text = "minecraft:"+text; //Add identifier if lacking.
+                            setCurrentError("warning.diorite.no_namespace");
+                        }
+                        String finalText = text;
 
-            entryTextField.setText(""); //Clear field after submission.
-        } else if(entryTextField.isFocused() && showItems) {
-            var suggestion = new Object() {String value;};
-            Registry.ITEM.stream().takeWhile(n -> suggestion.value==null).forEach(value -> {
-                if(Registry.ITEM.getId(value).toString().contains(entryTextField.getText())) {
-                    suggestion.value = Registry.ITEM.getId(value).toString();
+                        itemFilters.stream().takeWhile(n -> b.value).forEach(entry -> {
+                            if(finalText.equals(entry)) {
+                                setCurrentError("error.diorite.duplicate_filters");
+                                b.value=false;
+                            }
+                        });
+                        if(!b.value) {
+                            entryTextField.setText("");
+                            return false;
+                        } //If a duplicate, no reason to add it.
+
+                        if(Registry.ITEM.getDefaultId().equals(new Identifier(text))) {
+                            setCurrentError("warning.diorite.item_not_detected");
+                        }
+
+                        itemFilters.add(0, text); //Add the entry.
+
+
+                    } else if(showNames) {
+                        String finalText1 = text;
+                        List<String>newNameFilters= new ArrayList<>(nameFilters);
+                        nameFilters.stream().takeWhile(n -> b.value).forEach(entry -> {
+                            if(entry.contains(finalText1)) {
+                                setCurrentError("warning.diorite.contained_filter");
+                                newNameFilters.remove(entry);
+                            } else if(finalText1.contains(entry)) {
+                                setCurrentError("error.diorite.contains_filter");
+                                b.value=false;
+                            }
+                        });
+                        if(!b.value) {
+                            setText("");
+                            return false;
+                        } //A contained filter will always be superior, so why add it?
+                        nameFilters=newNameFilters;
+
+                        nameFilters.add(0, text);
+
+
+                    } else if(showNbtStrings) {
+                        String finalText1 = text;
+                        List<String>newNbtStringFilters= new ArrayList<>(nameFilters);
+                        nbtStringFilters.stream().takeWhile(n -> b.value).forEach(entry -> {
+                            if(entry.contains(finalText1)) {
+                                setCurrentError("warning.diorite.contained_filter");
+                                newNbtStringFilters.remove(entry);
+                            } else if(finalText1.contains(entry)) {
+                                setCurrentError("error.diorite.contains_filter");
+                                b.value=false;
+                            }
+                        });
+                        if(!b.value) {
+                            entryTextField.setText("");
+                            return false;
+                        } //A contained filter will always be superior, so why add it?
+                        nbtStringFilters=newNbtStringFilters;
+
+                        nbtStringFilters.add(0, text);
+
+                    }
+
+
+                    assert client != null;
+                    client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 0.8F));
+                    initEntries();
+
+                    entryTextField.setText(""); //Clear field after submission.
                 }
-            });
-            entryTextField.setSuggestion(suggestion.value);
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+                return superValue;
+            }
+        };
+        entryTextField.setDrawsBackground(false);
     }
 
     @Override
