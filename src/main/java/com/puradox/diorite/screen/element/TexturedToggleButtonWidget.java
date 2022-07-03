@@ -1,6 +1,7 @@
 package com.puradox.diorite.screen.element;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -43,9 +44,21 @@ public class TexturedToggleButtonWidget extends TexturedButtonWidget {
         RenderSystem.enableDepthTest();
     }
 
+    @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (this.active && this.visible) {
+            if (keyCode != 257 && keyCode != 32 && keyCode != 335) {
+                return false;
+            } else {
+                this.playDownSound(MinecraftClient.getInstance().getSoundManager());
+                this.onPress();
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
     @Override
-    public void onClick(double mouseX, double mouseY) {
-        super.onClick(mouseX, mouseY);
+    public void onPress() {
         this.toggle();
     }
 

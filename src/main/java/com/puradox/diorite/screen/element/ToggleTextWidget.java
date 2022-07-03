@@ -101,7 +101,21 @@ public class ToggleTextWidget extends ToggleButtonWidget {
         screen.renderTooltip(matrices, text, mouseX, mouseY);
     }
 
-    @Override public void onClick(double mouseX, double mouseY) {
+    @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (this.active && this.visible) {
+            if (keyCode != 257 && keyCode != 32 && keyCode != 335) {
+                return false;
+            } else {
+                this.playDownSound(MinecraftClient.getInstance().getSoundManager());
+                this.onPress();
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public void onPress() {
         this.setToggled(!isToggled());
     }
 }

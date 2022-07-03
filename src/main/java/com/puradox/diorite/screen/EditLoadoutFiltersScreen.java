@@ -478,7 +478,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
 
                     } else if(showNbtStrings) {
                         String finalText1 = text;
-                        List<String>newNbtStringFilters= new ArrayList<>(nameFilters);
+                        List<String>newNbtStringFilters= new ArrayList<>(nbtStringFilters);
                         nbtStringFilters.stream().takeWhile(n -> b.value).forEach(entry -> {
                             if(entry.contains(finalText1)) {
                                 setCurrentError("warning.diorite.contained_filter");
