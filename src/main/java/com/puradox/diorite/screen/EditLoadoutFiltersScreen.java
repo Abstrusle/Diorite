@@ -215,6 +215,9 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             }
 
             @Override public void onClick(double mouseX, double mouseY) {
+                onPress();
+            }
+            public void onPress() {
                 if(isToggled()) {
                     itemsSelected().forEach((value) -> setToggled(false));
                     this.setToggled(false);
@@ -236,6 +239,19 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                     initEntries();
                     this.setToggled(true);
                     showItems=true;
+                }
+            }
+            @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+                if (this.active && this.visible) {
+                    if (keyCode != 257 && keyCode != 32 && keyCode != 335) {
+                        return false;
+                    } else {
+                        this.playDownSound(MinecraftClient.getInstance().getSoundManager());
+                        this.onPress();
+                        return true;
+                    }
+                } else {
+                    return false;
                 }
             }
 
@@ -269,6 +285,10 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             }
 
             @Override public void onClick(double mouseX, double mouseY) {
+                onPress();
+            }
+
+            public void onPress() {
                 if(isToggled()) {
                     namesSelected().forEach((value) -> setToggled(false));
                     this.setToggled(false);
@@ -292,6 +312,19 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                 }
             }
 
+            @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+                if (this.active && this.visible) {
+                    if (keyCode != 257 && keyCode != 32 && keyCode != 335) {
+                        return false;
+                    } else {
+                        this.playDownSound(MinecraftClient.getInstance().getSoundManager());
+                        this.onPress();
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
             @Override protected boolean clicked(double mouseX, double mouseY) {
                 return this.active && this.visible && mouseX>=this.x && mouseX<=this.x+this.width && mouseY>=this.y+8 && mouseY<=this.y+height;
             }
@@ -321,6 +354,10 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             }
 
             @Override public void onClick(double mouseX, double mouseY) {
+                this.onPress();
+            }
+
+            public void onPress() {
                 if(isToggled()) {
                     nbtStringsSelected().forEach((value) -> setToggled(false));
                     initEntries();
@@ -344,6 +381,19 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                 }
             }
 
+            @Override public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+                if (this.active && this.visible) {
+                    if (keyCode != 257 && keyCode != 32 && keyCode != 335) {
+                        return false;
+                    } else {
+                        this.playDownSound(MinecraftClient.getInstance().getSoundManager());
+                        this.onPress();
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
             @Override protected boolean clicked(double mouseX, double mouseY) {
                 return this.active && this.visible && ((mouseX >= (double)this.x+56 && mouseY >= (double)this.y && mouseX < (double)(this.x + this.width) && mouseY < (double)(this.y + this.height))
                         || (mouseX>=this.x && mouseX<=this.x+this.width && mouseY>=this.y+8 && mouseY<=this.y+height));
