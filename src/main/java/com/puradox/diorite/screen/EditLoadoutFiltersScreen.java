@@ -584,7 +584,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
 
 
         Registry.ITEM.stream().takeWhile(n -> yPos.value<height-48).forEach((value) -> {
-            if(idPos.value >= currentPage*itemsFit-2) {
+            if(idPos.value >= currentPage*itemsFit-(2*currentPage)) {
                 if (xPos.value > width - 35) {
                     xPos.value = (this.width + backgroundWidth) / 2;
                     yPos.value += 18;
