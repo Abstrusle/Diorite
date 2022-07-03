@@ -11,9 +11,6 @@
   "error.diorite.duplicate_filters": "Entry is a duplicate!",
   "error.diorite.contains_filter": "Entry contains another entry!",
 
-  "error.diorite.first_page": "First page!",
-  "error.diorite.last_page": "Last page!",
-
   "warning.diorite.contained_filter": "Entry contained by another entry! The larger entry will be removed.",
   "warning.diorite.no_namespace": "No namespace specified! Will default to vanilla.",
   "warning.diorite.item_not_detected": "Item invalid! Cannot be filtered.",

@@ -607,7 +607,8 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         assert MinecraftClient.getInstance().currentScreen != null;
         leftPageButton = new TexturedButtonWidget((int)(width*0.8), this.height-25, 20, 20, 216, 40, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
             if (currentPage == 0) {
-                setCurrentError("error.diorite.first_page");
+                currentPage=(int)((double)Registry.ITEM.size()/itemsFit);
+                listAllRegistryItems();
             } else {
                 currentPage--;
                 listAllRegistryItems();
@@ -615,7 +616,8 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         });
         rightPageButton = new TexturedButtonWidget((int)(width*0.9), this.height-25,20, 20, 236, 40, 20, new Identifier("diorite", "gui/icons.png"), (PressAction) -> {
             if (currentPage == (int)((double)Registry.ITEM.size()/itemsFit)) {
-                setCurrentError("error.diorite.last_page");
+                currentPage=0;
+                listAllRegistryItems();
             } else {
                 currentPage++;
                 listAllRegistryItems();
