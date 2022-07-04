@@ -5,17 +5,17 @@ import com.puradox.diorite.screen.element.TexturedToggleButtonWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
 public class ConfigurationScreen extends Screen {
     private final Screen parent;
     public ConfigurationScreen(Screen parent) { //I do not recommend acknowleding anything here as 'best practice.' It just works.
-        super(new TranslatableText("screen.diorite.configuration"));
+        super(Text.translatable("screen.diorite.configuration"));
         this.parent=parent;
     }
 
@@ -23,7 +23,7 @@ public class ConfigurationScreen extends Screen {
     protected void init() {
         if(!(this.parent instanceof LoadoutScreen)) {
             //Need buttons for dump on select, loadout editor, and displaying loadout button
-            this.addDrawableChild(new ButtonWidget(this.width / 2 - 90, this.height / 6, 180, 20, new TranslatableText("screen.diorite.loadout"), PressAction -> {
+            this.addDrawableChild(new ButtonWidget(this.width / 2 - 90, this.height / 6, 180, 20, Text.translatable("screen.diorite.loadout"), PressAction -> {
                 assert client != null;
                 client.setScreen(new LoadoutScreen(true));
             }));
@@ -49,8 +49,8 @@ public class ConfigurationScreen extends Screen {
         renderBackground(matrices);
 
         drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 15, 16777215);
-        textRenderer.draw(matrices, new TranslatableText("option.diorite.dump_on_select"), (int)(this.width*0.2), (float)this.height/6 + 30, 0xDDDDDDDD);
-        textRenderer.draw(matrices, new TranslatableText("option.diorite.show_loadout_button"), (int)(this.width*0.2), (float)this.height/6 + 60, 0xDDDDDDDD);
+        textRenderer.draw(matrices, Text.translatable("option.diorite.dump_on_select"), (int)(this.width*0.2), (float)this.height/6 + 30, 0xDDDDDDDD);
+        textRenderer.draw(matrices, Text.translatable("option.diorite.show_loadout_button"), (int)(this.width*0.2), (float)this.height/6 + 60, 0xDDDDDDDD);
         super.render(matrices, mouseX, mouseY, delta);
     }
 }

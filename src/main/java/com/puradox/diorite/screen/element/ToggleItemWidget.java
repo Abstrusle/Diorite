@@ -11,10 +11,8 @@ import net.minecraft.client.gui.widget.ToggleButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -105,8 +103,8 @@ public class ToggleItemWidget extends ToggleButtonWidget {
     @Override
     public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY) {
         Screen screen = MinecraftClient.getInstance().currentScreen;
-        List<Text> text = new ArrayList<>(List.of(new LiteralText(itemString), Text.of("")));
-        this.warnings.forEach((value) -> text.add(new TranslatableText(value).setStyle(Style.EMPTY.withItalic(true).withColor(0xAAAA00))));
+        List<Text> text = new ArrayList<>(List.of(Text.literal(itemString), Text.of("")));
+        this.warnings.forEach((value) -> text.add(Text.translatable(value).setStyle(Style.EMPTY.withItalic(true).withColor(0xAAAA00))));
 
         assert screen != null;
         screen.renderTooltip(matrices, text, mouseX, mouseY);

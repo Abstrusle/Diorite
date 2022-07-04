@@ -30,7 +30,6 @@ import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
@@ -83,7 +82,7 @@ public class DioriteClient implements ClientModInitializer {
             if(loadoutKey.wasPressed()) {client.setScreen(new LoadoutScreen(false));}
             if(discardKey.wasPressed()) {
                 if(currentLoadout==null) {
-                    player.sendMessage(new TranslatableText("error.diorite.no_selected_loadout"), false);
+                    player.sendMessage(Text.translatable("error.diorite.no_selected_loadout"), false);
                 } else {
                     startFiltering();
                     assert client.currentScreen != null;
@@ -148,7 +147,7 @@ public class DioriteClient implements ClientModInitializer {
             ScreenKeyboardEvents.afterKeyPress(screen).register((screen1, key, scancode, modifiers) -> {
                 if(discardKey.matchesKey(key, scancode) && inInventory) {
                     if(currentLoadout==null) {
-                        player.sendMessage(new TranslatableText("error.diorite.no_selected_loadout"), false);
+                        player.sendMessage(Text.translatable("error.diorite.no_selected_loadout"), false);
                     } else {startFiltering();}
                 } else if (loadoutKey.matchesKey(key, scancode) && inInventory) {
                     inInventory=false;

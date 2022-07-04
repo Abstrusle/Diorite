@@ -9,14 +9,14 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public class LoadoutScreen extends Screen { //I do not recommend acknowleding an
     private final boolean configureOnly;
 
     public LoadoutScreen(boolean configureOnly) {
-        super(new TranslatableText("screen.diorite.loadout"));
+        super(Text.translatable("screen.diorite.loadout"));
         this.configureOnly = configureOnly;
     }
 
@@ -110,7 +110,7 @@ public class LoadoutScreen extends Screen { //I do not recommend acknowleding an
                     client.setScreen(new EditLoadoutScreen(new LoadoutConfiguration(DioriteClient.getConfig().loadoutConfigs.size()), false));
                 }) {
             @Override public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY) {
-                LoadoutScreen.this.renderTooltip(matrices, new TranslatableText("button.diorite.new_loadout"), mouseX, mouseY);
+                LoadoutScreen.this.renderTooltip(matrices, Text.translatable("button.diorite.new_loadout"), mouseX, mouseY);
             }
         };
 
@@ -121,7 +121,7 @@ public class LoadoutScreen extends Screen { //I do not recommend acknowleding an
                         client.setScreen(new ConfigurationScreen(ModMenuIntegration.menuReturn()));
                     });
         } else {
-            configButton = new ButtonWidget(this.width / 2-60, this.height / (2)+backgroundHeight/2, 120, 20, new TranslatableText("screen.diorite.configuration"),
+            configButton = new ButtonWidget(this.width / 2-60, this.height / (2)+backgroundHeight/2, 120, 20, Text.translatable("screen.diorite.configuration"),
                     (PressAction) -> {
                         assert client != null;
                         client.setScreen(new ConfigurationScreen(this));

@@ -1,7 +1,6 @@
 package com.puradox.diorite.screen.element;
 
 import com.puradox.diorite.DioriteClient;
-import com.puradox.diorite.screen.EditLoadoutFiltersScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -12,7 +11,6 @@ import net.minecraft.client.gui.widget.ToggleButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +93,7 @@ public class ToggleTextWidget extends ToggleButtonWidget {
         Screen screen = MinecraftClient.getInstance().currentScreen;
 
         List<Text> text = new ArrayList<>();
-        this.warnings.forEach((value) -> text.add(new TranslatableText(value).setStyle(Style.EMPTY.withItalic(true).withColor(0xAAAA00))));
+        this.warnings.forEach((value) -> text.add(Text.translatable(value).setStyle(Style.EMPTY.withItalic(true).withColor(0xAAAA00))));
 
         assert screen != null;
         screen.renderTooltip(matrices, text, mouseX, mouseY);

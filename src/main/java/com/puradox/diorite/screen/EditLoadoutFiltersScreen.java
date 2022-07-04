@@ -8,16 +8,15 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.gui.widget.ToggleButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.lwjgl.glfw.GLFW;
@@ -72,7 +71,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
     List<ToggleItemWidget> currentItemsPreview = new ArrayList<>();
 
     public EditLoadoutFiltersScreen (LoadoutConfiguration loadout) {
-        super(new TranslatableText("screen.diorite.edit_loadout_filters"));
+        super(Text.translatable("screen.diorite.edit_loadout_filters"));
 
         this.loadout=loadout;
         this.originalLoadout = loadout;
@@ -123,11 +122,11 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         var f = new Object() {double value = -0.01;}; //Used for Y in item list. Scrollbar will impact these positions.
         nameEntries = new ArrayList<>();
         nameFilters.forEach((value) ->
-                nameEntries.add(new ToggleTextWidget(((this.width - backgroundWidth)/2)+10, ((this.height - backgroundHeight)/2)+44+(i.value++*10)+(scrollLevel*10), false, new LiteralText(value), this.textRenderer, 0)));
+                nameEntries.add(new ToggleTextWidget(((this.width - backgroundWidth)/2)+10, ((this.height - backgroundHeight)/2)+44+(i.value++*10)+(scrollLevel*10), false, Text.literal(value), this.textRenderer, 0)));
         i.value=0;
         nbtStringEntries = new ArrayList<>();
         nbtStringFilters.forEach((value) ->
-                nbtStringEntries.add(new ToggleTextWidget(((this.width - backgroundWidth)/2)+10, ((this.height - backgroundHeight)/2)+44+(i.value++*10)+(scrollLevel*10), false, new LiteralText(value), this.textRenderer, 1)));
+                nbtStringEntries.add(new ToggleTextWidget(((this.width - backgroundWidth)/2)+10, ((this.height - backgroundHeight)/2)+44+(i.value++*10)+(scrollLevel*10), false, Text.literal(value), this.textRenderer, 1)));
         i.value=0;
         itemEntries = new ArrayList<>();
         itemFilters.forEach((value) -> {
@@ -162,7 +161,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             client.setScreen(new EditLoadoutScreen(loadout, true));
         }) {
             @Override public void renderTooltip(MatrixStack matrixStack, int i, int j) {
-                EditLoadoutFiltersScreen.this.renderTooltip(matrixStack, new TranslatableText("tooltip.diorite.save"), i, j);
+                EditLoadoutFiltersScreen.this.renderTooltip(matrixStack, Text.translatable("tooltip.diorite.save"), i, j);
             }
         };
 
@@ -187,13 +186,13 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
                 namesSelected().forEach((value) -> {
                     value.visible=false;
                     nameEntries.remove(value);
-                    nameFilters.remove(value.getMessage().asString());
+                    nameFilters.remove(value.getMessage().getString());
                 });
             } else if(nbtStringsButton.isToggled()) {
                 nbtStringsSelected().forEach((value) -> {
                     value.visible=false;
                     nbtStringEntries.remove(value);
-                    nbtStringFilters.remove(value.getMessage().asString());
+                    nbtStringFilters.remove(value.getMessage().getString());
                 });
             }
             initEntries();
@@ -266,7 +265,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             }
         };
         itemsButton.setTextureUV(0, 32, 68, 25, new Identifier("diorite", "gui/icons.png"));
-        itemsButton.setMessage(new TranslatableText("tooltip.diorite.items"));
+        itemsButton.setMessage(Text.translatable("tooltip.diorite.items"));
 
 
 
@@ -334,7 +333,7 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             }
         };
         namesButton.setTextureUV(0, 82, 68, 25, new Identifier("diorite", "gui/icons.png"));
-        namesButton.setMessage(new TranslatableText("tooltip.diorite.names"));
+        namesButton.setMessage(Text.translatable("tooltip.diorite.names"));
 
 
 
@@ -405,10 +404,10 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
             }
         };
         nbtStringsButton.setTextureUV(0, 132, 68, 25, new Identifier("diorite", "gui/icons.png"));
-        nbtStringsButton.setMessage(new TranslatableText("tooltip.diorite.nbt_strings"));
+        nbtStringsButton.setMessage(Text.translatable("tooltip.diorite.nbt_strings"));
 
         //Use suggestions.
-        entryTextField = new TextFieldWidget(textRenderer, (this.width/2)-95, ((this.height - backgroundHeight)/2)+14, 175, 14, new TranslatableText("widgets.diorite.add_entry")) {
+        entryTextField = new TextFieldWidget(textRenderer, (this.width/2)-95, ((this.height - backgroundHeight)/2)+14, 175, 14, Text.translatable("widgets.diorite.add_entry")) {
             @Override
             public boolean charTyped(char chr, int modifiers) {
                 boolean superValue = super.charTyped(chr, modifiers);
@@ -558,13 +557,13 @@ public class EditLoadoutFiltersScreen extends Screen { //I do not recommend ackn
         if(modifiable && !entryTextField.isFocused()) {
             entryTextField.setSuggestion("");
             if(entryTextField.getText().length()<1) {
-                textRenderer.draw(matrices, new TranslatableText("widgets.diorite.add_entry"), (this.width - backgroundWidth)/(float)2+23, ((this.height - backgroundHeight)/(float)2)+14, 0xFFFFFFFF);
+                textRenderer.draw(matrices, Text.translatable("widgets.diorite.add_entry"), (this.width - backgroundWidth)/(float)2+23, ((this.height - backgroundHeight)/(float)2)+14, 0xFFFFFFFF);
             }
 
         }
 
         //Render the current error, if present.
-        this.textRenderer.draw(matrices, new TranslatableText(currentError), (this.width-textRenderer.getWidth(new TranslatableText(currentError)))/(float)2, this.height-30, 0xFF0000);
+        this.textRenderer.draw(matrices, Text.translatable(currentError), (this.width-textRenderer.getWidth(Text.translatable(currentError)))/(float)2, this.height-30, 0xFF0000);
         if(ticks++>99) {
             currentError="";
             ticks = 0;

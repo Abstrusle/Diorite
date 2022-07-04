@@ -96,7 +96,7 @@ public class LoadoutEntry extends LoadoutConfiguration implements Drawable {
                     (PressAction) -> {}) {
                 @Override
                 public void renderTooltip(MatrixStack matrixStack, int i, int j) {
-                    screen.renderTooltip(matrixStack, new TranslatableText("tooltip.diorite.delete_example"), i, j);
+                    screen.renderTooltip(matrixStack, Text.translatable("tooltip.diorite.delete_example"), i, j);
                 }
             };
         } else {
@@ -119,7 +119,7 @@ public class LoadoutEntry extends LoadoutConfiguration implements Drawable {
                     }) {
                 @Override
                 public void renderTooltip(MatrixStack matrixStack, int i, int j) {
-                    screen.renderTooltip(matrixStack, new TranslatableText("tooltip.diorite.delete"), i, j);
+                    screen.renderTooltip(matrixStack, Text.translatable("tooltip.diorite.delete"), i, j);
                 }
             };
         }
@@ -132,7 +132,7 @@ public class LoadoutEntry extends LoadoutConfiguration implements Drawable {
                     (PressAction) -> client.setScreen(new EditLoadoutScreen(heldLoadout, false)));
         } //Example or obscure custom entries use their own texture for the edit button.
 
-        this.selectButton = new PressableWidget(this.x, this.y, width, height, new TranslatableText("button.diorite.select_loadout")) {
+        this.selectButton = new PressableWidget(this.x, this.y, width, height, Text.translatable("button.diorite.select_loadout")) {
             @Override public void appendNarrations(NarrationMessageBuilder builder) {
                 this.appendDefaultNarrations(builder);
             }
@@ -148,35 +148,35 @@ public class LoadoutEntry extends LoadoutConfiguration implements Drawable {
             @Override public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY) {
                 List<Text> includedItems = new ArrayList<>();
                 if(itemFilters.size()>0) {
-                    includedItems.add(new TranslatableText("tooltip.diorite.items").setStyle(
+                    includedItems.add(Text.translatable("tooltip.diorite.items").setStyle(
                             Style.EMPTY
                                     .withColor(0x0000FF)
                                     .withBold(true)
                     ));
-                    itemFilters.forEach((value) -> includedItems.add(new LiteralText(value).setStyle(
+                    itemFilters.forEach((value) -> includedItems.add(Text.literal(value).setStyle(
                             Style.EMPTY.withItalic(true).withColor(0x998888)
                     )));
                 }
 
 
                 if(nameFilters.size()>0) {
-                    includedItems.add(new TranslatableText("tooltip.diorite.names").setStyle(
+                    includedItems.add(Text.translatable("tooltip.diorite.names").setStyle(
                             Style.EMPTY
                                     .withColor(0x00FF00)
                                     .withBold(true)
                     ));
-                    nameFilters.forEach((value) -> includedItems.add(new LiteralText(value).setStyle(
+                    nameFilters.forEach((value) -> includedItems.add(Text.literal(value).setStyle(
                             Style.EMPTY.withItalic(true).withColor(0x998888)
                     )));
                 }
 
                 if(nbtStringFilters.size()>0) {
-                    includedItems.add(new TranslatableText("tooltip.diorite.nbt_strings").setStyle(
+                    includedItems.add(Text.translatable("tooltip.diorite.nbt_strings").setStyle(
                             Style.EMPTY
                                     .withColor(0xFFFF00)
                                     .withBold(true)
                     ));
-                    nbtStringFilters.forEach((value) -> includedItems.add(new LiteralText(value).setStyle(
+                    nbtStringFilters.forEach((value) -> includedItems.add(Text.literal(value).setStyle(
                             Style.EMPTY.withItalic(true).withColor(0x998888)
                     )));
                 }
